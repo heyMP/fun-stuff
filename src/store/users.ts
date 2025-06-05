@@ -1,6 +1,6 @@
 import { Signal } from '@heymp/signals';
-import { safeParse } from 'valibot';
 import * as Schema from '../mocks/models/users/schema.js';
+import * as UserService from '../services/users.js';
 
 export type User = Schema.User;
 
@@ -24,21 +24,11 @@ export class UsersStore {
    * @returns Promise that resolves to void on success or Error on failure
    */
   async sync(): Promise<void | Error> {
-    try {
-      const res = await fetch('api/users').then(r => r.json());
-      const parsed = safeParse(Schema.UsersSchema, res);
-      if (parsed.success) {
-        this.users.value = parsed.output;
-      }
-      const e = new Error('failed to parse');
-      e.cause = parsed.issues;
-      throw e;
-    } catch (e: unknown) {
-      if (e instanceof Error) {
-        e.message = `[UsersStore sync] ${e.message}`
-      }
-      return e as Error;
+    const res = await UserService.getUsers();
+    if (res instanceof Error) {
+      return res;
     }
+    this.users.value = res;
   }
 
   /**
@@ -62,22 +52,11 @@ export class UsersStore {
    * @returns Promise that resolves to void on success or Error on failure
    */
   async create(): Promise<void | Error> {
-    try {
-      const res = await fetch('api/users/create').then(r => r.json());
-      const parsed = safeParse(Schema.UserSchema, res);
-      if (parsed.success) {
-        this.users.value = [...this.users.value ?? [], parsed.output];
-      }
-      const e = new Error('failed to parse');
-      e.cause = parsed.issues;
-      throw e;
-    } catch (e: unknown) {
-      if (e instanceof Error) {
-        e.message = `[UsersStore create] ${e.message}`
-      }
-      console.dir('hi', e)
-      return e as Error;
+    const res = await UserService.createUser();
+    if (res instanceof Error) {
+      return res;
     }
+    this.users.value = [...this.users?.value ?? [], res];
   }
 }
 

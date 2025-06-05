@@ -1,4 +1,3 @@
-import * as v from 'valibot';
 import { http, HttpResponse } from 'msw';
 import { createUsers, createUser } from './models/users/mock.js';
 import * as AuthMock from './models/auth/mock.js';

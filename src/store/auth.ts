@@ -1,6 +1,7 @@
 import { Signal } from '@heymp/signals';
 import { safeParse } from 'valibot';
 import * as Schema from '../mocks/models/auth/schema.js';
+import * as AuthService from '../services/auth.js';
 
 /**
  * Ordinal Enum / Ordinal Mapping
@@ -18,7 +19,6 @@ type State = keyof typeof STATES;
 
 class AuthStore {
   constructor() { }
-
 
   user = new Signal.State<Schema.AuthResponse | undefined | false>(undefined);
 
@@ -49,27 +49,16 @@ class AuthStore {
     const req: Schema.AuthRequest = {
       email: 'example@example.com'
     }
-    const res = await fetch('/api/login', {
-      method: 'POST',
-      body: JSON.stringify(req),
-    })
-      .then(r => r.json());
-
-    const user = safeParse(Schema.AuthResponseSchema, res);
-    if (!user.success) {
-      const e = new Error('failed to login');
-      e.cause = user.issues;
-      this.error.value = e;
-      this.user.value = false;
-      return e;
+    const res = await AuthService.login(req);
+    if (res instanceof Error) {
+      return res;
     }
+    this.user.value = res;
 
-    this.user.value = user.output;
     this._timedRefresh();
   }
 
   async _timedRefresh() {
-    console.log('timedrefresh')
     await new Promise(res => setTimeout(res, 5000));
     this.refreshing.value = true;
     await this.login();
