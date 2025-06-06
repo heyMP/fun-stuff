@@ -40,18 +40,6 @@ class AppStore {
       }
       return 'dashboard';
     }
-    // if (AuthStore.store.state.value === 'UNAUTHENTICATED') {
-    //   return 'login';
-    // }
-    // if (InitStore.store.state.value === 'error') {
-    //   return 'login';
-    // }
-    // if (InitStore.store.state.value === 'complete') {
-    //   if (UsersStore.store.selectedUser.value) {
-    //     return 'user';
-    //   }
-    //   return 'dashboard';
-    // }
     return 'initializing';
   }
 }
