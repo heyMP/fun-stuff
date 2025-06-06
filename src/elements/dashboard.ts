@@ -29,15 +29,16 @@ export class MyDashboard extends LitElement {
 
   render() {
     return html`
+      Users: ${UsersStore.store.users.value?.length}
+      <button id="create" @click=${this._handleUsersCreate}>Create</button>
       <ul>
         ${UsersStore.store.users.value?.map(user => this.renderUser(user))}
       </ul>
-      <button id="create" @click=${this._handleUsersCreate}>Create</button>
     `;
   }
 
   renderUser(user: UsersStore.User) {
-    return html`<li><button @click=${() => this._handleUserSelect(user)}>${user.name}: ${user.email}</button></li>`
+    return html`<li>${user.name} <button @click=${() => this._handleUserSelect(user)}>➡️</button> <button @click=${() => this._handleUsersDelete(user)}>❌</button></li>`
   }
 
   async _handleUserSelect(user: UsersStore.User) {
@@ -49,6 +50,10 @@ export class MyDashboard extends LitElement {
     if (error) {
       console.log('oh snap', error.cause);
     }
+  }
+
+  async _handleUsersDelete(user: UsersStore.User) {
+    UsersStore.store.delete(user);
   }
 
   async _handleUsersSync() {

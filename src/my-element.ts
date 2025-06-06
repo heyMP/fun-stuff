@@ -1,5 +1,5 @@
 import { type State } from '@heymp/signals';
-import { LitElement, html } from 'lit'
+import { LitElement, css, html } from 'lit'
 import { customElement } from 'lit/decorators.js';
 import * as AppStore from './store/app.js';
 import * as AuthStore from './store/auth.js';
@@ -45,6 +45,12 @@ export class MyElement extends LitElement {
       ${appStore.state.value === 'user' ? html`<my-user></my-user>` : ''}
     `;
   }
+
+  static styles = css`
+    :host {
+      margin: auto;
+    }
+  `
 }
 
 declare global {

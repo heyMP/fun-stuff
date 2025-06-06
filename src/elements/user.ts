@@ -30,9 +30,9 @@ export class MyUser extends LitElement {
     const user = UsersStore.store.selectedUser.value;
     return html`
       ${user?.name}
-      <button @click=${() => UsersStore.store.selectedUser.value = undefined}>Back</button>
+      <button @click=${() => UsersStore.store.selectedUser.value = undefined}>⬅️</button>
       ${user ? html`
-        <button @click=${() => UsersStore.store.delete(user)}>Delete</button>
+        <button @click=${() => UsersStore.store.delete(user)}>❌</button>
       `: ''}
     `;
   }
