@@ -4,12 +4,10 @@ import { customElement } from 'lit/decorators.js';
 import * as AppStore from './store/app.js';
 import * as AuthStore from './store/auth.js';
 import * as UsersStore from './store/users.js';
+import './elements/initialize.js';
 import './elements/dashboard.js';
 import './elements/user.js';
-
-const appStore = AppStore.store;
-const authStore = AuthStore.store;
-const usersStore = UsersStore.store;
+import './elements/login.js';
 
 /**
  * An example element.
@@ -25,10 +23,10 @@ export class MyElement extends LitElement {
   }
 
   async _init() {
-    appStore.initialize();
-    this._watchSignal(appStore.state);
-    this._watchSignal(usersStore.users);
-    this._watchSignal(authStore.updated);
+    AppStore.store.initialize();
+    this._watchSignal(AppStore.store.state);
+    this._watchSignal(AuthStore.store.state);
+    this._watchSignal(UsersStore.store.users);
   }
 
   async _watchSignal(signal: State<any>) {
@@ -39,11 +37,24 @@ export class MyElement extends LitElement {
 
   render() {
     return html`
-      <div>App State: ${appStore.state.value}</div>
-      <div>${authStore.state.value} ${!!authStore.user?.value ? authStore.user.value.name : ''}</div>
-      ${appStore.state.value === 'dashboard' ? html`<my-dashboard></my-dashboard>` : ''}
-      ${appStore.state.value === 'user' ? html`<my-user></my-user>` : ''}
+      ${this.renderNav()}
+      ${AppStore.store.state.value === 'initializing' ? html`<my-initializing></my-initializing>` : ''}
+      ${AppStore.store.state.value === 'dashboard' ? html`<my-dashboard></my-dashboard>` : ''}
+      ${AppStore.store.state.value === 'user' ? html`<my-user></my-user>` : ''}
+      ${AppStore.store.state.value === 'login' ? html`<my-login></my-login>` : ''}
     `;
+  }
+
+  renderNav() {
+    const user = AuthStore.store.user.value;
+    if (user) {
+      return html`
+        <div>
+          ${user ? user.name : ''}<button @click=${() => AuthStore.store.logout()}>Logout</button>
+        </div> 
+      `;
+    }
+    return '';
   }
 
   static styles = css`

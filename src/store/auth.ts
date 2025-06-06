@@ -2,19 +2,10 @@ import { Signal } from '@heymp/signals';
 import * as Schema from '../mocks/models/auth/schema.js';
 import * as AuthService from '../services/auth.js';
 
-/**
- * Ordinal Enum / Ordinal Mapping
- *
- * Allows us to have sort order of an enum.
- */
-export const STATES = {
-  INITIALIZING: 0,
-  UNAUTHENTICATED: 1,
-  AUTHENTICATED: 2,
-  REFRESHING: 3,
-} as const;
-
-type State = keyof typeof STATES;
+type State = 
+  | 'AUTHENTICATED'
+  | 'UNAUTHENTICATED'
+  | 'INITIALIZING';
 
 class AuthStore {
   constructor() { }
@@ -23,28 +14,28 @@ class AuthStore {
 
   refreshing = new Signal.State(false);
 
-  state = new Signal.Computed(() => {
-    if (this.refreshing.value === true) {
-      return 'REFRESHING' as State;
-    }
+  state = new Signal.Computed(() => this._computeState(), [this.user]);
+
+  private _computeState(): State {
     if (!!this.user.value) {
-      return 'AUTHENTICATED' as State;
+      return 'AUTHENTICATED';
     }
     if (this.user.value === false) {
-      return 'UNAUTHENTICATED' as State;
+      return 'UNAUTHENTICATED';
     }
-    return 'INITIALIZING' as State;
-  }, [this.user, this.refreshing]);
+    return 'INITIALIZING';
+  }
 
   error = new Signal.State<Error | undefined>(undefined);
-
-  updated = new Signal.Computed(() => new Date(), [this.user, this.refreshing, this.state, this.error]);
 
   init() {
     this.login();
   }
 
   async login() {
+    if (this.state.value !== 'INITIALIZING') {
+      this.refreshing.value = true;
+    }
     const req: Schema.AuthRequest = {
       email: 'example@example.com'
     }
@@ -53,16 +44,19 @@ class AuthStore {
       return res;
     }
     this.user.value = res;
-
-    this._timedRefresh();
+    this.refreshing.value = false;
   }
 
-  async _timedRefresh() {
-    await new Promise(res => setTimeout(res, 5000));
-    this.refreshing.value = true;
-    await this.login();
-    this.refreshing.value = false;
+  async logout() {
+    this.user.value = false;
   }
 }
 
 export const store = new AuthStore();
+
+store.user.addEventListener('updated', () => {
+  console.log('store user: ', store.user.value);
+})
+store.state.addEventListener('updated', () => {
+  console.log('store state: ', store.state.value);
+})

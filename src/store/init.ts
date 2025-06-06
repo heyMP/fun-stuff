@@ -1,7 +1,6 @@
 import { Signal } from '@heymp/signals';
 import * as AuthStore from './auth.js';
 import * as UsersStore from './users.js';
-import { worker } from '../mocks/browser.js';
 
 export type State =
   | 'initializing'
@@ -14,7 +13,8 @@ class InitStore {
   public state = new Signal.Computed(() => this._computeState(), [AuthStore.store.state, UsersStore.store.state]);
 
   public async initialize() {
-    await worker.start();
+    const browser = await import('../mocks/browser.js');
+    await browser.worker.start();
     AuthStore.store.init();
     for await (const authState of AuthStore.store.state) {
       if (authState === 'AUTHENTICATED' && this.state.value === 'initializing') {
@@ -33,7 +33,7 @@ class InitStore {
       }
       return 'initializing';
     }
-    if (AuthStore.store.state.value === 'UNAUTHENTICATEn') {
+    if (AuthStore.store.state.value === 'UNAUTHENTICATE') {
       return 'error';
     }
     return 'initializing';
