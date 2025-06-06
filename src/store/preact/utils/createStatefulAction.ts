@@ -7,9 +7,9 @@ import type { Status } from '../types.js';
  */
 interface ActionConfig<T extends any[]> {
   // The status to set before the action's logic is executed.
-  preStatus: Status;
+  preStatus?: Status;
   // The status to set after the action's logic successfully completes.
-  postStatus: Status;
+  postStatus?: Status;
   // The core async business logic.
   action: (...args: T) => Promise<any>;
 }
@@ -23,12 +23,16 @@ interface ActionConfig<T extends any[]> {
  */
 export function createStatefulAction<T extends any[]>(config: ActionConfig<T>) {
   return async (...args: T) => {
-    state.status.value = config.preStatus;
+    if (config.preStatus) {
+      state.status.value = config.preStatus;
+    }
     state.error.value = null;
 
     try {
       await config.action(...args);
-      state.status.value = config.postStatus;
+      if (config.postStatus) {
+        state.status.value = config.postStatus;
+      }
     } catch (err) {
       state.error.value = err as Error;
       state.status.value = 'ERROR';

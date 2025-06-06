@@ -1,74 +1,60 @@
-import { type State } from '@heymp/signals';
-import { LitElement, css, html } from 'lit'
+import { LitElement, css, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import * as AppStore from '../store/app.js';
-import * as UsersStore from '../store/users.js';
+import { SignalWatcher } from '@lit-labs/preact-signals';
 
-/**
- * An example element.
- *
- * @slot - This element has a slot
- * @csspart button - The button
- */
+// --- New Store Imports ---
+import { state } from '../store/preact/state.js';
+import { createUser, deleteUser, selectUser } from '../store/preact/actions.js';
+import type { User } from '../store/preact/types.js';
+
 @customElement('my-dashboard')
-export class MyDashboard extends LitElement {
-  connectedCallback(): void {
-    super.connectedCallback();
-    this._init();
-  }
-
-  async _init() {
-    this._watchSignal(UsersStore.store.users);
-  }
-
-  async _watchSignal(signal: State<any>) {
-    for await (const _ of signal) {
-      this.requestUpdate();
-    }
-  }
-
+export class MyDashboard extends SignalWatcher(LitElement) {
   render() {
     return html`
-      Users: ${UsersStore.store.users.value?.length}
-      <button id="create" @click=${this._handleUsersCreate}>Create</button>
+      <div class="dashboard-header">
+        <h2>Users: ${state.users.value?.length ?? 0}</h2>
+        <button id="create" @click=${() => createUser()}>Create User</button>
+      </div>
       <ul>
-        ${UsersStore.store.users.value?.map(user => this.renderUser(user))}
+        ${state.users.value?.map(user => this.renderUser(user))}
       </ul>
     `;
   }
 
-  renderUser(user: UsersStore.User) {
-    return html`<li>${user.name} <button @click=${() => this._handleUserSelect(user)}>➡️</button> <button @click=${() => this._handleUsersDelete(user)}>❌</button></li>`
-  }
-
-  async _handleUserSelect(user: UsersStore.User) {
-    AppStore.store.selectUser(user);
-  }
-
-  async _handleUsersCreate() {
-    const error = await UsersStore.store.create();
-    if (error) {
-      console.log('oh snap', error.cause);
-    }
-  }
-
-  async _handleUsersDelete(user: UsersStore.User) {
-    UsersStore.store.delete(user);
-  }
-
-  async _handleUsersSync() {
-    const error = await UsersStore.store.sync();
-    if (error) {
-      console.log('oh snap', error.cause);
-    }
+  private renderUser(user: User) {
+    return html`
+      <li>
+        <span>${user.name}</span>
+        <div class="user-actions">
+          <button @click=${() => selectUser(user)}>View Details ➡️</button>
+          <button @click=${() => deleteUser(user)} class="delete-btn">❌</button>
+        </div>
+      </li>
+    `;
   }
 
   static styles = css`
-  `
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5rem;
+      border-bottom: 1px solid #ccc;
+    }
+    .dashboard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+  `;
 }
 
 declare global {
   interface HTMLElementTagNameMap {
-    'my-dashboard': MyDashboard
+    'my-dashboard': MyDashboard;
   }
 }

@@ -9,7 +9,6 @@ import type { User, AuthRequest } from './types';
  */
 export const initializeApp = createStatefulAction({
   preStatus: 'INITIALIZING',
-  postStatus: 'PENDING_AUTH',
   action: async () => {
     await functions.startBrowserWorker();
     // After initialization, immediately attempt to log in.
