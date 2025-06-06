@@ -22,7 +22,7 @@ export async function login(req: Schema.LoginRequest): Promise<Schema.LoginRespo
   }
 }
 
-export async function logout(req: Schema.LogoutResponse): Promise<Schema.LogoutResponse | Error> {
+export async function logout(req: Schema.LogoutRequest): Promise<Schema.LogoutResponse | Error> {
   try {
     const res = await fetch('/api/logout', { body: JSON.stringify(req), method: 'POST'});
     if (!res.ok) {

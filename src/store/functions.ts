@@ -1,11 +1,11 @@
-import * as AuthService from '../../mocks/models/auth/service.js';
-import * as UserService from '../../mocks/models/users/service.js';
+import * as AuthService from '../mocks/models/auth/service.js';
+import * as UserService from '../mocks/models/users/service.js';
 
 /**
  * Starts the mock service worker.
  */
 export const startBrowserWorker = async () => {
-  const browser = await import('../../mocks/browser.js');
+  const browser = await import('../mocks/browser.js');
   return browser.worker.start();
 };
 

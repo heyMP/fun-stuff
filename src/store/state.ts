@@ -1,5 +1,5 @@
 import { signal } from '@preact/signals';
-import type { User, Users, AuthResponse, Status } from './types';
+import type { User, Users, AuthUser, Status } from './types';
 
 /**
  * A single object containing all the core, mutable state signals for the application.
@@ -9,7 +9,7 @@ export const state = {
   status: signal<Status>('INITIALIZING'),
 
   // The authenticated user's data, or null if not logged in.
-  authUser: signal<AuthResponse | null>(null),
+  authUser: signal<AuthUser | null>(null),
 
   // The list of all users.
   users: signal<Users | null | undefined>(null),

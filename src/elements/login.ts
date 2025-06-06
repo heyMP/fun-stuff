@@ -3,8 +3,8 @@ import { customElement } from 'lit/decorators.js';
 import { SignalWatcher } from '@lit-labs/preact-signals';
 
 // --- New Store Imports ---
-import { state } from '../store/preact/state.js';
-import { login } from '../store/preact/actions.js';
+import { state } from '../store/state.js';
+import { login } from '../store/actions.js';
 
 @customElement('my-login')
 export class MyLogin extends SignalWatcher(LitElement) {
@@ -16,7 +16,7 @@ export class MyLogin extends SignalWatcher(LitElement) {
 
     return html`
       ${state.status.value === 'ERROR' ? html`${state.error.value?.message}` : ''} 
-      <button @click=${() => login({ email: 'example@example.com' })}>Login</button>
+      <button @click=${() => login('example@example.com')}>Login</button>
     `;
   }
 }

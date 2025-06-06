@@ -3,8 +3,8 @@ import { customElement } from 'lit/decorators.js';
 import { SignalWatcher } from '@lit-labs/preact-signals';
 
 // --- New Store Imports ---
-import { state } from '../store/preact/state.js';
-import { deleteUser } from '../store/preact/actions.js';
+import { state } from '../store/state.js';
+import { deleteUser } from '../store/actions.js';
 
 @customElement('my-user')
 export class MyUser extends SignalWatcher(LitElement) {

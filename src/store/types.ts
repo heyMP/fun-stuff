@@ -1,5 +1,5 @@
-import * as Schema from '../../mocks/models/users/schema.js';
-import * as AuthSchema from '../../mocks/models/auth/schema.js';
+import * as Schema from '../mocks/models/users/schema.js';
+import * as AuthSchema from '../mocks/models/auth/schema.js';
 
 // Re-exporting schema types for use in the application.
 export type User = Schema.User;

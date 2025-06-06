@@ -3,9 +3,9 @@ import { customElement } from 'lit/decorators.js';
 import { SignalWatcher } from '@lit-labs/preact-signals';
 
 // --- New Store Imports ---
-import { state } from '../store/preact/state.js';
-import { createUser, deleteUser, selectUser } from '../store/preact/actions.js';
-import type { User } from '../store/preact/types.js';
+import { state } from '../store/state.js';
+import { createUser, deleteUser, selectUser } from '../store/actions.js';
+import type { User } from '../store/types.js';
 
 @customElement('my-dashboard')
 export class MyDashboard extends SignalWatcher(LitElement) {

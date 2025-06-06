@@ -27,5 +27,6 @@ export type LoginResponse = v.InferOutput<typeof LoginResponseSchema>;
 export const LogoutRequestSchema = v.object({
   email: v.pipe(v.string(), v.email()),
 });
+export type LogoutRequest = v.InferOutput<typeof LoginRequestSchema>;
 export const LogoutResponseSchema = v.void();
 export type LogoutResponse = v.InferOutput<typeof LogoutResponseSchema>;

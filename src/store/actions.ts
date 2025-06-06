@@ -12,7 +12,7 @@ export const initializeApp = createStatefulAction({
   action: async () => {
     await functions.startBrowserWorker();
     // After initialization, immediately attempt to log in.
-    await login({ email: 'example@example.com' });
+    await login('example@example.com');
   },
 });
 
@@ -22,11 +22,22 @@ export const initializeApp = createStatefulAction({
 export const login = createStatefulAction({
   preStatus: 'AUTHENTICATING',
   postStatus: 'FETCHING_USERS', // On success, we know the next step is fetching users.
-  action: async (req: AuthUser) => {
-    const res = await functions.apiLogin({ email: req.email });
+  action: async (email: AuthUser['email']) => {
+    const res = await functions.apiLogin({ email });
     if (res instanceof Error) throw res;
     state.authUser.value = res;
-    // The successful state change will trigger the effect to fetch users.
+  },
+});
+
+/**
+ * Logs the user in. Wrapped to handle status and errors automatically.
+ */
+export const logout = createStatefulAction({
+  postStatus: 'ERROR', // On success, we know the next step is fetching users.
+  action: async (email: AuthUser['email']) => {
+    const res = await functions.apiLogout({ email });
+    if (res instanceof Error) throw res;
+    state.authUser.value = null;
   },
 });
 
@@ -70,14 +81,6 @@ export const deleteUser = async (user: User) => {
 };
 
 // --- Synchronous Actions ---
-
-/**
- * Logs the user out by clearing the auth user and resetting the status.
- */
-export const logout = () => {
-  state.authUser.value = null;
-  state.status.value = 'INITIALIZING'; // Or a new 'LOGGED_OUT' state if desired.
-};
 
 /**
  * Sets the currently selected user.

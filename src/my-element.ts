@@ -4,10 +4,10 @@ import { SignalWatcher } from '@lit-labs/preact-signals';
 
 // --- New Store Imports ---
 // Import specific items from our new, organized store files.
-import { state } from './store/preact/state.js';
-import { view } from './store/preact/computed.js';
-import { initializeApp, logout } from './store/preact/actions.js';
-import './store/preact/effects.js'; // Import once to activate the reactive effects.
+import { state } from './store/state.js';
+import { view } from './store/computed.js';
+import { initializeApp, logout } from './store/actions.js';
+import './store/effects.js'; // Import once to activate the reactive effects.
 
 // Import the elements needed for each view.
 import './elements/initialize.js';
@@ -56,7 +56,7 @@ export class MyElement extends SignalWatcher(LitElement) { // <-- Use the Signal
       return html`
         <nav>
           <span>${user.name}</span>
-          <button @click=${logout}>Logout</button>
+          <button @click=${() => logout(user.email)}>Logout</button>
         </nav>
       `;
     }

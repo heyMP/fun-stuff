@@ -3,7 +3,7 @@ import { customElement } from 'lit/decorators.js';
 import { SignalWatcher } from '@lit-labs/preact-signals';
 
 // --- New Store Imports ---
-import { state } from '../store/preact/state.js';
+import { state } from '../store/state.js';
 
 @customElement('my-initialize')
 export class MyInitialize extends SignalWatcher(LitElement) {
