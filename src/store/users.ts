@@ -4,6 +4,11 @@ import * as UserService from '../services/users.js';
 
 export type User = Schema.User;
 
+export type State =
+  | 'initializing'
+  | 'complete'
+  | 'error';
+
 export class UsersStore {
   /**
    * Store for managing user data in the application.
@@ -12,11 +17,25 @@ export class UsersStore {
    * 
    * @property users - A reactive signal containing the current list of users or undefined if not yet loaded
    */
-  constructor() { }
+  constructor() {}
 
   users = new Signal.State<Schema.Users | undefined>(undefined);
 
-  private pendingSync: Promise<void | Error> | null = null;
+  selectedUser = new Signal.State<Schema.User | undefined>(undefined);
+
+  error = new Signal.State<Error | undefined>(undefined);
+
+  state = new Signal.Computed(() => this._computeState(), [this.users, this.error]);
+
+  private _computeState(): State {
+    if (this.users.value) {
+      return 'complete';
+    }
+    if (this.error.value) {
+      return 'error';
+    }
+    return 'initializing';
+  }
 
   /**
    * Synchronizes the users data from the API.
@@ -26,24 +45,10 @@ export class UsersStore {
   async sync(): Promise<void | Error> {
     const res = await UserService.getUsers();
     if (res instanceof Error) {
+      this.error.value = res;
       return res;
     }
     this.users.value = res;
-  }
-
-  /**
-   * Performs a batched synchronization of users data.
-   * If a sync is already in progress, returns the existing promise instead of starting a new sync.
-   * This prevents multiple simultaneous sync operations.
-   * @returns Promise that resolves to void on success or Error on failure
-   */
-  async batchedSync(): Promise<void | Error> {
-    if (!this.pendingSync) {
-      this.pendingSync = this.sync().finally(() => {
-        this.pendingSync = null;
-      });
-    }
-    return this.pendingSync;
   }
 
   /**
@@ -54,10 +59,21 @@ export class UsersStore {
   async create(): Promise<void | Error> {
     const res = await UserService.createUser();
     if (res instanceof Error) {
+      this.error.value = res;
       return res;
     }
     this.users.value = [...this.users?.value ?? [], res];
   }
+
+  async delete(user: Schema.User): Promise<void | Error> {
+    const res = await UserService.deleteUser(user);
+    if (res instanceof Error) {
+      this.error.value = res;
+      return res;
+    }
+    this.users.value = this.users.value?.filter(u => u.id !== user.id);
+    this.selectedUser.value = undefined;
+  }
 }
 
-export const usersStore = new UsersStore();
+export const store = new UsersStore();

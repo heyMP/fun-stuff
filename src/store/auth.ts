@@ -1,5 +1,4 @@
 import { Signal } from '@heymp/signals';
-import { safeParse } from 'valibot';
 import * as Schema from '../mocks/models/auth/schema.js';
 import * as AuthService from '../services/auth.js';
 
@@ -66,4 +65,4 @@ class AuthStore {
   }
 }
 
-export const authStore = new AuthStore();
+export const store = new AuthStore();

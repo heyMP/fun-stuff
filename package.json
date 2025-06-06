@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "playwright test --headed"
   },
   "dependencies": {
     "@heymp/signals": "^0.1.2",
@@ -16,6 +17,7 @@
   },
   "devDependencies": {
     "@faker-js/faker": "^9.8.0",
+    "@types/node": "^22.15.29",
     "msw": "^2.9.0",
     "typescript": "~5.8.3",
     "valimock": "^1.1.0",

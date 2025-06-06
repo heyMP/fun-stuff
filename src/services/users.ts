@@ -38,3 +38,19 @@ export async function createUser(): Promise<Schema.User | Error> {
     return e as Error;
   }
 }
+
+export async function deleteUser(user: Schema.User): Promise<true | Error> {
+  try {
+    const res = await fetch(`api/users/${user.id}`, { method: 'DELETE' });
+    if (res.ok) {
+      return true;
+    }
+    throw new Error('failed to delete');
+  } catch (e: unknown) {
+    if (e instanceof Error) {
+      e.message = `[UserService deleteUser] ${e.message}`
+    }
+    console.dir(e);
+    return e as Error;
+  }
+}
