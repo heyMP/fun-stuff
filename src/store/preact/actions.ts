@@ -48,7 +48,7 @@ export const syncUsers = createStatefulAction({
  * app status but updates the user list on success.
  */
 export const createUser = async () => {
-  const res = await functions.apiCreateUser();
+  const res = await functions.apiCreateUser({ email: 'example@example.com' });
   if (res instanceof Error) {
     state.error.value = res;
     return;

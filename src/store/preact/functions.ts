@@ -1,6 +1,5 @@
-import * as UserService from '../../services/users.js';
 import * as AuthService from '../../services/auth.js';
-import * as Schema from '../../mocks/models/users/schema.js';
+import * as UserService from '../../mocks/models/users/service.js';
 import type { AuthRequest } from './types.js';
 
 /**
@@ -15,6 +14,6 @@ export const startBrowserWorker = async () => {
 export const apiLogin = (req: AuthRequest) => AuthService.login(req);
 
 // --- User Functions ---
-export const apiGetUsers = () => UserService.getUsers();
-export const apiCreateUser = () => UserService.createUser();
-export const apiDeleteUser = (user: Schema.User) => UserService.deleteUser(user);
+export const apiGetUsers = UserService.getUsers;
+export const apiCreateUser = UserService.createUser;
+export const apiDeleteUser = UserService.deleteUser;

@@ -1,8 +1,12 @@
 import { Valimock } from "valimock";
-import { UserSchema } from './schema.js';
+import * as Schema from './schema.js';
 
-export function createUser() {
-  return new Valimock().mock(UserSchema);
+export function createUser(req?: Schema.CreateUserRequest) {
+  const user = new Valimock().mock(Schema.UserSchema);
+  if (req) {
+    user.email = req.email;
+  }
+  return user;
 }
 
 export function createUsers() {
