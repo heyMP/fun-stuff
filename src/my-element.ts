@@ -1,57 +1,63 @@
-import { type State } from '@heymp/signals';
-import { LitElement, css, html } from 'lit'
+import { LitElement, css, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import * as AppStore from './store/app.js';
-import * as AuthStore from './store/auth.js';
-import * as UsersStore from './store/users.js';
+import { SignalWatcher } from '@lit-labs/preact-signals';
+
+// --- New Store Imports ---
+// Import specific items from our new, organized store files.
+import { state } from './store/preact/state.js';
+import { view } from './store/preact/computed.js';
+import { initializeApp, logout } from './store/preact/actions.js';
+import './store/preact/effects.js'; // Import once to activate the reactive effects.
+
+// Import the elements needed for each view.
 import './elements/initialize.js';
 import './elements/dashboard.js';
 import './elements/user.js';
 import './elements/login.js';
 
 /**
- * An example element.
- *
- * @slot - This element has a slot
- * @csspart button - The button
+ * An example element that is automatically reactive to the store's signals.
  */
 @customElement('my-element')
-export class MyElement extends LitElement {
+export class MyElement extends SignalWatcher(LitElement) { // <-- Use the SignalWatcher mixin
+  private static isInitialized = false;
+
   connectedCallback(): void {
     super.connectedCallback();
-    this._init();
-  }
-
-  async _init() {
-    AppStore.store.initialize();
-    this._watchSignal(AppStore.store.state);
-    this._watchSignal(AuthStore.store.state);
-    this._watchSignal(UsersStore.store.users);
-  }
-
-  async _watchSignal(signal: State<any>) {
-    for await (const _ of signal) {
-      this.requestUpdate();
+    // Ensure the main app initialization action is called only once.
+    if (!MyElement.isInitialized) {
+      initializeApp();
+      MyElement.isInitialized = true;
     }
   }
 
+  // A map to associate view states with their corresponding templates.
+  private viewMap = {
+    LOADING: html`<my-initialize></my-initialize>`,
+    DASHBOARD: html`<my-dashboard></my-dashboard>`,
+    USER_DETAIL: html`<my-user></my-user>`,
+    LOGIN: html`<my-login></my-login>`,
+  };
+
   render() {
+    // Render the navigation and the current view based on the computed signal.
     return html`
       ${this.renderNav()}
-      ${AppStore.store.state.value === 'initializing' ? html`<my-initialize></my-initialize>` : ''}
-      ${AppStore.store.state.value === 'dashboard' ? html`<my-dashboard></my-dashboard>` : ''}
-      ${AppStore.store.state.value === 'user' ? html`<my-user></my-user>` : ''}
-      ${AppStore.store.state.value === 'login' ? html`<my-login></my-login>` : ''}
+      <main>
+        ${this.viewMap[view.value] || ''}
+      </main>
     `;
   }
 
   renderNav() {
-    const user = AuthStore.store.user.value;
+    // Read directly from our unified state object.
+    const user = state.authUser.value;
     if (user) {
       return html`
-        <div>
-          ${user ? user.name : ''}<button @click=${() => AuthStore.store.logout()}>Logout</button>
-        </div> 
+        <nav>
+          <span>${user.name}</span>
+          <button @click=${logout}>Logout</button>
+        </nav>
       `;
     }
     return '';
@@ -61,11 +67,11 @@ export class MyElement extends LitElement {
     :host {
       margin: auto;
     }
-  `
+  `;
 }
 
 declare global {
   interface HTMLElementTagNameMap {
-    'my-element': MyElement
+    'my-element': MyElement;
   }
 }

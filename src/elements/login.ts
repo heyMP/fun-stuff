@@ -1,46 +1,28 @@
-import { State } from '@heymp/signals';
-import { LitElement, css, html } from 'lit'
+import { LitElement, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import * as AuthStore from '../store/auth.js';
+import { SignalWatcher } from '@lit-labs/preact-signals';
 
-/**
- * An example element.
- *
- * @slot - This element has a slot
- * @csspart button - The button
- */
+// --- New Store Imports ---
+import { state } from '../store/preact/state.js';
+import { login } from '../store/preact/actions.js';
+
 @customElement('my-login')
-export class MyLogin extends LitElement {
-  connectedCallback(): void {
-    super.connectedCallback();
-    this._init();
-  }
-
-  async _init() {
-    this._watchSignal(AuthStore.store.refreshing);
-  }
-
-  async _watchSignal(signal: State<any>) {
-    for await (const _ of signal) {
-      this.requestUpdate();
-    }
-  }
-
+export class MyLogin extends SignalWatcher(LitElement) {
   render() {
-    if (AuthStore.store.refreshing.value) {
-      return html`♻️`;
+    // Show a loading indicator when the app is in an authenticating state.
+    if (state.status.value === 'AUTHENTICATING') {
+      return html`<div>Authenticating... ♻️</div>`;
     }
+
     return html`
-      <button @click=${() => AuthStore.store.login()}>Login</button>
+      ${state.status.value === 'ERROR' ? html`${state.error.value?.message}` : ''} 
+      <button @click=${() => login({ email: 'example@example.com' })}>Login</button>
     `;
   }
-
-  static styles = css`
-  `
 }
 
 declare global {
   interface HTMLElementTagNameMap {
-    'my-login': MyLogin
+    'my-login': MyLogin;
   }
 }

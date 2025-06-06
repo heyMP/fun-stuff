@@ -1,27 +1,30 @@
-import { LitElement, css, html } from 'lit'
+import { LitElement, css, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import * as AppStore from '../store/app.js';
+import { SignalWatcher } from '@lit-labs/preact-signals';
 
-/**
- * An example element.
- *
- * @slot - This element has a slot
- * @csspart button - The button
- */
+// --- New Store Imports ---
+import { state } from '../store/preact/state.js';
+
 @customElement('my-initialize')
-export class MyInitialize extends LitElement {
+export class MyInitialize extends SignalWatcher(LitElement) {
   render() {
     return html`
-      <div>App State: ${AppStore.store.state.value}</div>
+      <div class="container">
+        <h2>Loading Application...</h2>
+        <p>Status: ${state.status.value}</p>
+        <div class="spinner"></div>
+      </div>
     `;
   }
 
   static styles = css`
-  `
+    .container { text-align: center; padding: 2rem; }
+    .spinner { /* Add your loading spinner styles here */ }
+  `;
 }
 
 declare global {
   interface HTMLElementTagNameMap {
-    'my-initialize': MyInitialize
+    'my-initialize': MyInitialize;
   }
 }
