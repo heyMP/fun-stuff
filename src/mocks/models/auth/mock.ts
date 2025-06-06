@@ -1,13 +1,14 @@
-import * as v from 'valibot';
-import { Valimock } from "valimock";
-import * as Auth from './schema.js';
+import { Valimock } from 'valimock';
+import * as Schema from './schema.js';
 
-export function createAuthResponse(req: any) {
-  const authReq = v.safeParse(Auth.AuthRequestSchema, req);
-  if (!authReq.success) {
-    return authReq;
+export function createLoginResponse(req: Schema.LoginRequest): Schema.LoginResponse {
+  const res = new Valimock().mock(Schema.LoginResponseSchema);
+  if (req) {
+    res.email = req.email;
   }
-  const res = new Valimock().mock(Auth.AuthResponseSchema);
-  res.email = req.email;
   return res;
+}
+
+export function createLogoutResponse(): Schema.LogoutResponse {
+  return;
 }

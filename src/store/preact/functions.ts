@@ -1,6 +1,5 @@
-import * as AuthService from '../../services/auth.js';
+import * as AuthService from '../../mocks/models/auth/service.js';
 import * as UserService from '../../mocks/models/users/service.js';
-import type { AuthRequest } from './types.js';
 
 /**
  * Starts the mock service worker.
@@ -11,7 +10,8 @@ export const startBrowserWorker = async () => {
 };
 
 // --- Authentication Functions ---
-export const apiLogin = (req: AuthRequest) => AuthService.login(req);
+export const apiLogin = AuthService.login;
+export const apiLogout = AuthService.logout;
 
 // --- User Functions ---
 export const apiGetUsers = UserService.getUsers;

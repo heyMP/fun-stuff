@@ -1,7 +1,7 @@
 import { state } from './state.js';
 import { createStatefulAction } from './utils/createStatefulAction.js';
 import * as functions from './functions';
-import type { User, AuthRequest } from './types';
+import type { User, AuthUser } from './types';
 
 /**
  * Initializes the application by starting the mock worker and then
@@ -22,8 +22,8 @@ export const initializeApp = createStatefulAction({
 export const login = createStatefulAction({
   preStatus: 'AUTHENTICATING',
   postStatus: 'FETCHING_USERS', // On success, we know the next step is fetching users.
-  action: async (req: AuthRequest) => {
-    const res = await functions.apiLogin(req);
+  action: async (req: AuthUser) => {
+    const res = await functions.apiLogin({ email: req.email });
     if (res instanceof Error) throw res;
     state.authUser.value = res;
     // The successful state change will trigger the effect to fetch users.

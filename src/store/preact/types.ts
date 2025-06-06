@@ -4,8 +4,7 @@ import * as AuthSchema from '../../mocks/models/auth/schema.js';
 // Re-exporting schema types for use in the application.
 export type User = Schema.User;
 export type Users = Schema.Users;
-export type AuthResponse = AuthSchema.AuthResponse;
-export type AuthRequest = AuthSchema.AuthRequest;
+export type AuthUser = AuthSchema.AuthUser;
 
 /**
  * Represents the overall status of the application, combining initialization,
