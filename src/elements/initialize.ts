@@ -1,6 +1,6 @@
 import { LitElement, css, html } from 'lit'
 import { customElement } from 'lit/decorators.js';
-import * as AuthStore from '../store/auth.js';
+import * as AppStore from '../store/app.js';
 
 /**
  * An example element.

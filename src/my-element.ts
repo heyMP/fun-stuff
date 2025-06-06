@@ -38,7 +38,7 @@ export class MyElement extends LitElement {
   render() {
     return html`
       ${this.renderNav()}
-      ${AppStore.store.state.value === 'initializing' ? html`<my-initializing></my-initializing>` : ''}
+      ${AppStore.store.state.value === 'initializing' ? html`<my-initialize></my-initialize>` : ''}
       ${AppStore.store.state.value === 'dashboard' ? html`<my-dashboard></my-dashboard>` : ''}
       ${AppStore.store.state.value === 'user' ? html`<my-user></my-user>` : ''}
       ${AppStore.store.state.value === 'login' ? html`<my-login></my-login>` : ''}
