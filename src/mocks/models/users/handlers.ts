@@ -16,7 +16,7 @@ export const handlers = [
     if (!parsed.success) {
       return HttpResponse.error();
     }
-    const user = createUser();
+    const user = createUser(parsed.output);
     users.push(user);
     return HttpResponse.json(user);
   }),
