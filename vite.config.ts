@@ -11,5 +11,16 @@ export default defineConfig({
   build: {
     // Not strictly needed for this dev server approach, but good practice
     minify: false,
+    rollupOptions: {
+      input: {
+        'my-element': 'src/my-element.ts',
+        'mocks/browser': 'src/mocks/browser.ts'
+      },
+      output: {
+        entryFileNames: '[name].js',
+        chunkFileNames: '[name].js',
+        assetFileNames: '[name].[ext]'
+      }
+    }
   },
 });

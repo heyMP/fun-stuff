@@ -14,13 +14,13 @@
     "@lit-labs/preact-signals": "^1.0.3",
     "@preact/signals": "^2.2.0",
     "lit": "^3.3.0",
-    "valibot": "^1.1.0",
-    "wretch": "^2.11.0"
+    "valibot": "^1.1.0"
   },
   "devDependencies": {
     "@faker-js/faker": "^9.8.0",
     "@types/node": "^22.15.29",
     "msw": "^2.9.0",
+    "playwright": "^1.52.0",
     "typescript": "~5.8.3",
     "valimock": "^1.1.0",
     "vite": "^6.3.5"
