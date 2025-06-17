@@ -14,7 +14,6 @@ export default defineConfig({
     rollupOptions: {
       input: {
         'my-element': 'src/my-element.ts',
-        'mocks/browser': 'src/mocks/browser.ts'
       },
       output: {
         entryFileNames: '[name].js',
