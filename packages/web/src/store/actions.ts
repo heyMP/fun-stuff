@@ -1,6 +1,6 @@
 import { state } from './state.js';
-import { createStatefulAction } from './utils/createStatefulAction.js';
-import * as functions from './functions';
+import { createStatefulAction, getFunction } from './utils/createStatefulAction.js';
+import { functionRegistry } from './functions.js'; // Import to register functions and get types
 import type { User, AuthUser } from './types';
 
 /**
@@ -10,7 +10,8 @@ import type { User, AuthUser } from './types';
 export const initializeApp = createStatefulAction({
   preStatus: 'INITIALIZING',
   action: async () => {
-    await functions.startBrowserWorker();
+    const startBrowserWorker = getFunction('startBrowserWorker');
+    await startBrowserWorker();
     // After initialization, immediately attempt to log in.
     await login('example@example.com');
   },
@@ -23,8 +24,8 @@ export const login = createStatefulAction({
   preStatus: 'AUTHENTICATING',
   postStatus: 'FETCHING_USERS', // On success, we know the next step is fetching users.
   action: async (email: AuthUser['email']) => {
-    const res = await functions.apiLogin({ email });
-    if (res instanceof Error) throw res;
+    const apiLogin = getFunction('apiLogin');
+    const res = await apiLogin({ email });
     state.authUser.value = res;
   },
 });
@@ -33,10 +34,10 @@ export const login = createStatefulAction({
  * Logs the user in. Wrapped to handle status and errors automatically.
  */
 export const logout = createStatefulAction({
-  postStatus: 'ERROR', // On success, we know the next step is fetching users.
+  postStatus: 'LOGIN', // On success, we know the next step is fetching users.
   action: async (email: AuthUser['email']) => {
-    const res = await functions.apiLogout({ email });
-    if (res instanceof Error) throw res;
+    const apiLogout = getFunction('apiLogout');
+    await apiLogout({ email });
     state.authUser.value = null;
   },
 });
@@ -48,8 +49,8 @@ export const syncUsers = createStatefulAction({
   preStatus: 'FETCHING_USERS',
   postStatus: 'READY', // This is the final step for a successful load.
   action: async () => {
-    const res = await functions.apiGetUsers();
-    if (res instanceof Error) throw res;
+    const apiGetUsers = getFunction('apiGetUsers');
+    const res = await apiGetUsers();
     state.users.value = res;
   },
 });
@@ -59,25 +60,33 @@ export const syncUsers = createStatefulAction({
  * app status but updates the user list on success.
  */
 export const createUser = async () => {
-  const res = await functions.apiCreateUser({ email: 'example@example.com' });
-  if (res instanceof Error) {
-    state.error.value = res;
-    return;
+  try {
+    const apiCreateUser = getFunction('apiCreateUser');
+    const res = await apiCreateUser({ email: 'example@example.com' });
+    state.users.value = [...(state.users.value ?? []), res];
+  } catch (err) {
+    if (err && typeof err === 'object' && 'functionId' in err && 'error' in err) {
+      const enhancedError = err as { functionId: keyof typeof functionRegistry; error: Error };
+      state.error.value = { id: enhancedError.functionId, error: enhancedError.error } as any;
+    }
   }
-  state.users.value = [...(state.users.value ?? []), res];
 };
 
 /**
  * Deletes a user.
  */
 export const deleteUser = async (user: User) => {
-  const res = await functions.apiDeleteUser(user);
-  if (res instanceof Error) {
-    state.error.value = res;
-    return;
+  try {
+    const apiDeleteUser = getFunction('apiDeleteUser');
+    await apiDeleteUser(user);
+    state.users.value = state.users.value?.filter((u) => u.id !== user.id);
+    state.selectedUser.value = null; // Clear selection after deletion.
+  } catch (err) {
+    if (err && typeof err === 'object' && 'functionId' in err && 'error' in err) {
+      const enhancedError = err as { functionId: keyof typeof functionRegistry; error: Error };
+      state.error.value = { id: enhancedError.functionId, error: enhancedError.error } as any;
+    }
   }
-  state.users.value = state.users.value?.filter((u) => u.id !== user.id);
-  state.selectedUser.value = null; // Clear selection after deletion.
 };
 
 // --- Synchronous Actions ---

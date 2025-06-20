@@ -9,13 +9,14 @@ import { login } from '../store/actions.js';
 @customElement('my-login')
 export class MyLogin extends SignalWatcher(LitElement) {
   render() {
+    console.log(state.status.value)
     // Show a loading indicator when the app is in an authenticating state.
     if (state.status.value === 'AUTHENTICATING') {
       return html`<div>Authenticating... ♻️</div>`;
     }
 
     return html`
-      ${state.status.value === 'ERROR' ? html`${state.error.value?.message}` : ''} 
+      ${state.status.value === 'ERROR' ? html`${state.error.value?.error.message}` : ''} 
       <button @click=${() => login('example@example.com')}>Login</button>
     `;
   }

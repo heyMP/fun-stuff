@@ -1,5 +1,6 @@
 import { signal } from '@preact/signals';
 import type { User, Users, AuthUser, Status } from './types';
+import type { FunctionError } from './functions.js';
 
 /**
  * A single object containing all the core, mutable state signals for the application.
@@ -17,6 +18,6 @@ export const state = {
   // The currently selected user for a detail view.
   selectedUser: signal<User | null>(null),
 
-  // A global error object for handling failures.
-  error: signal<Error | null>(null),
+  // A global error object with automatic type inference from registered functions.
+  error: signal<FunctionError | null>(null),
 };

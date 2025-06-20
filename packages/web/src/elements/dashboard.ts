@@ -4,7 +4,7 @@ import { SignalWatcher } from '@lit-labs/preact-signals';
 
 // --- New Store Imports ---
 import { state } from '../store/state.js';
-import { createUser, deleteUser, selectUser } from '../store/actions.js';
+import * as Actions from '../store/actions.js';
 import type { User } from '../store/types.js';
 
 @customElement('my-dashboard')
@@ -13,7 +13,8 @@ export class MyDashboard extends SignalWatcher(LitElement) {
     return html`
       <div class="dashboard-header">
         <h2>Users: ${state.users.value?.length ?? 0}</h2>
-        <button id="create" @click=${() => createUser()}>Create User</button>
+        <button id="create" @click=${() => Actions.createUser()}>Create User</button>
+        ${this.renderCreateUserError()}
       </div>
       <ul>
         ${state.users.value?.map(user => this.renderUser(user))}
@@ -26,11 +27,23 @@ export class MyDashboard extends SignalWatcher(LitElement) {
       <li>
         <span>${user.name}</span>
         <div class="user-actions">
-          <button @click=${() => selectUser(user)}>View Details ➡️</button>
-          <button @click=${() => deleteUser(user)} class="delete-btn">❌</button>
+          <button @click=${() => Actions.selectUser(user)}>View Details ➡️</button>
+          <button @click=${() => Actions.deleteUser(user)} class="delete-btn">❌</button>
         </div>
       </li>
     `;
+  }
+
+  private renderCreateUserError() {
+    const error = state.error.value;
+    if (!error) return html``;
+    if (error.id === 'apiCreateUser') {
+      if (error.error._tag === 'parse-error') {
+        return html`<div class="error">Error creating user: the data was malformatted</div>`;
+      }
+      return html`<div class="error">Error creating user: there was an unknown error</div>`;
+    }
+    return html``;
   }
 
   static styles = css`
@@ -49,6 +62,14 @@ export class MyDashboard extends SignalWatcher(LitElement) {
       display: flex;
       justify-content: space-between;
       align-items: center;
+    }
+    .error {
+      background-color: #fee;
+      color: #c33;
+      padding: 0.5rem;
+      border-radius: 4px;
+      margin: 0.5rem 0;
+      border: 1px solid #fcc;
     }
   `;
 }
