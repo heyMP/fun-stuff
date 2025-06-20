@@ -40,6 +40,7 @@ export class MyElement extends SignalWatcher(LitElement) { // <-- Use the Signal
   };
 
   render() {
+    console.log(view.value)
     // Render the navigation and the current view based on the computed signal.
     return html`
       ${this.renderNav()}

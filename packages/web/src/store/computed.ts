@@ -23,6 +23,9 @@ export const view = computed<View>(() => {
     case 'READY':
       return 'DASHBOARD';
 
+    case 'LOGIN':
+      return 'LOGIN';
+
     case 'ERROR':
       return 'LOGIN';
 

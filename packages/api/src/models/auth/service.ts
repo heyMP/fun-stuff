@@ -1,40 +1,34 @@
 import { safeParse } from 'valibot';
 import * as Schema from './schema.js';
+import * as Errors from '../../lib/errors.js';
 
-export async function login(req: Schema.LoginRequest): Promise<Schema.LoginResponse | Error> {
+export async function login(req: Schema.LoginRequest) {
   try {
     const res = await fetch('/api/login', { body: JSON.stringify(req), method: 'POST'})
       .then(r => r.json());
 
     const parsed = safeParse(Schema.LoginResponseSchema, res);
     if (!parsed.success) {
-      const e = new Error('failed to parse');
-      e.cause = parsed.issues;
-      throw e;
+      return new Errors.ParseError(parsed.issues);
     }
     return parsed.output;
-  } catch (e: unknown) {
-    if (e instanceof Error) {
-      e.message = `[AuthService login] ${e.message}`;
-    }
+  } catch (error: unknown) {
+    const e = new Errors.UnknownError(error as Error);
     console.dir(e);
-    return e as Error;
+    return e;
   }
 }
 
-export async function logout(req: Schema.LogoutRequest): Promise<Schema.LogoutResponse | Error> {
+export async function logout(req: Schema.LogoutRequest) {
   try {
     const res = await fetch('/api/logout', { body: JSON.stringify(req), method: 'POST'});
     if (!res.ok) {
-      const e = new Error(`status not ok ${res.status}`);
-      throw e;
+      return new Errors.InvalidResponseError(res);
     }
     return;
-  } catch (e: unknown) {
-    if (e instanceof Error) {
-      e.message = `[AuthService login] ${e.message}`;
-    }
+  } catch (error: unknown) {
+    const e = new Errors.UnknownError(error as Error);
     console.dir(e);
-    return e as Error;
+    return e;
   }
 }

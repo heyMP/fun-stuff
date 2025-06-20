@@ -14,6 +14,7 @@ export type Status =
   | 'AUTHENTICATING' // The login API call is in progress.
   | 'FETCHING_USERS' // Login succeeded, now fetching user data.
   | 'READY' // All data is loaded and the app is interactive.
+  | 'LOGIN' // For aunauthenticated users
   | 'ERROR'; // A critical error occurred.
 
 /**
