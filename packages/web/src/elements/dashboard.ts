@@ -38,7 +38,10 @@ export class MyDashboard extends SignalWatcher(LitElement) {
     const error = state.error.value;
     if (!error) return html``;
     if (error.id === 'apiCreateUser') {
-      return html`<div class="error">Error creating user: ${error.error.message}</div>`;
+      if (error.error._tag === 'parse-error') {
+        return html`<div class="error">Error creating user: the data was malformatted</div>`;
+      }
+      return html`<div class="error">Error creating user: there was an unknown error</div>`;
     }
     return html``;
   }
